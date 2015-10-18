@@ -1,113 +1,148 @@
-#include<iostream.h>
-#include<stdio.h>
+#include<iostream>
 #include<string>
+
 using namespace std;
 
-public class Worker
-{
-public:
-	char name;
+class Worker {
+private:
+	string name;
 	int age;
-	int sex;
-	int pay_per_hour;
+	string sex;
+	double pay_per_hour;
+public:
+	Worker(string n, int a, string s, double p) {
+		name = n;
+		age = a;
+		sex = s;
+		pay_per_hour = p;
+	}
 
-//	int hourly_paylevel;
-//	int hours;
-	//int compute_pay;
+	string getName() {
+		return name;
+	}
 
-	void Compute_pay(double hours){
-		//double compute_pay = hours * pay_per_hour;
-	};
+	int getAge() {
+		return age;
+	}
 
-	void Name(){
-		//用户姓名作为用户选择的菜单项
-	};
+	string getSex() {
+		return sex;
+	}
 
+	double getPayPerHour() {
+		return pay_per_hour;
+	}
 
-	friend ostream& operator<<(ostream& out,Worker& worker){
-		cout<<"age:"<<worker.age<<"  sex:"<<worker.sex<<"  pay_per_hour:"<<worker.pay_per_hour<<"  compute_pay"<<worker.compute_pay<<endl;
-	};
+	friend ostream& operator <<(ostream& out, Worker& worker);
 
-
-
-};
-
-int hourly_paylevel;
-int hours;
-int compute_pay;
-
-public class HourlyWorker : Worker
-{
-private:
-	void Compute_pay(double hours){
-		if(hours <= 40)
-		{ int compute_pay = pay_per_hour * hours;}
-		else
-			compute_pay = pay_per_hour * 40 + 1.5 * pay_per_hour * (hours - 40);
+	virtual void compute_pay(double hours) {
 	}
 };
 
-public class SalariedWorker : Worker
-{
-private:
-	void Compute_pay(double hours){
-		if(hours >= 35)
-		{compute_pay = pay_per_hour * 40;}
-		else
-			compute_pay = pay_per_hour * hours + 0.5 * pay_per_hour * (35 - hours);
+class HourlyWorker: public Worker {
+public:
+	HourlyWorker(string n, int a, string s, double p) :
+			Worker(n, a, s, p) {
 	}
-
+	void compute_pay(double hours) {
+		double weekSala = 0;
+		if (hours >= 40) {
+			weekSala = getPayPerHour() * 40
+					+ 1.5 * getPayPerHour() * (hours - 40);
+		} else {
+			weekSala = getPayPerHour() * hours;
+		}
+		cout << "该工人的周薪为：" << weekSala << endl;
+	}
 };
 
-void main()
-{
-	cout<<"请按如下格式输入工人信息：姓名，年龄，性别，类别，薪金等级"<<endl;
-	Worker *workers[5];   
-	
-	for(int i=0;i<5;i++)
-	{
-		cin>>name>>age>>sex>>type>>paylevel;
-		int pay_per_hour = 0;
-		char name =" ";
-		int age = 0;
-		char sex = "Male";
-		char type = "计时工人";
-		int paylevel = "0";
-
-		
-		switch(paylevel)
-		{
-		case 1:
-			pay_per_hour = 10;
-			break;
-		case 2:
-			pay_per_hour = 20;
-			break;
-		case 3:
-			pay_per_hour = 30;
-			break;
-		case 4:
-			pay_per_hour = 40;
-			break;
-		case 5:
-			pay_per_hour = 50;
-			break;
-		default:
-			cout<<"薪资等级输入有误，请重新输入";
-		}
-
-		if(type == "计时工人"&&paylevel == 10 || paylevel == 20 || paylevel == 40)
-		{
-			HourlyWorker* hourlyworker[i] = new HourlyWorker;
-			&hourlyworker = workers[i];
-		}
-		else if(type == "薪资工人"&&paylevel == 30 || paylevel == 50)
-		{
-			SalariedWorker* salariedworker[i] = new SalariedWorker;
-			salariedworker = workers[i];
-		}
-		else
-			cout<<"输入错误！请重新输入"<<endl;
-
+class SalariedWorker: public Worker {
+public:
+	SalariedWorker(string n, int a, string s, double p) :
+			Worker(n, a, s, p) {
 	}
+	void compute_pay(double hours) {
+		int weekSala = 0;
+		if (hours >= 35) {
+			weekSala = getPayPerHour() * 40;
+		} else {
+			weekSala = getPayPerHour() * hours
+					+ 0.5 * getPayPerHour() * (35 - hours);
+		}
+		cout << "该工人的周薪为：" << weekSala << endl;
+	}
+};
+
+ostream& operator <<(ostream& out, Worker& worker) {
+	out << "姓名: " << worker.getName() << endl;
+	out << "年龄: " << worker.getAge() << endl;
+	out << "性别: " << worker.getSex() << endl;
+	out << "薪资等级: " << worker.getPayPerHour() << endl;
+	return out;
+}
+
+int main() {
+	cout << "请输入五个工人信息" << endl;
+
+	Worker* workers[5];
+
+	int i = 0;
+	for (; i < 5; i++) {
+		cout << "请按如下格式输入工人信息：姓名，年龄，性别，类别（1.HourlyWorker 2.SalariedWorker），薪金等级"
+				<< endl;
+		string name;
+		int age;
+		string sex;
+		int type;
+		double paylevel;
+		cin >> name >> age >> sex >> type >> paylevel;
+
+		if (type == 1) {
+			workers[i] = new HourlyWorker(name, age, sex, paylevel);
+		} else {
+			workers[i] = new SalariedWorker(name, age, sex, paylevel);
+		}
+	}
+
+	while (true) {
+		cout << "请选择一个工人（输入名字）或退出（输入exit）" << endl;
+		for (i = 0; i < 5; i++) {
+			cout << workers[i]->getName() << " ";
+		}
+		cout << endl;
+
+		string selected;
+		cin >> selected;
+
+		if ("exit" == selected) {
+			break;
+		} else {
+			bool found = false;
+			for (i = 0; i < 5; i++) {
+				string n = workers[i]->getName();
+				if (selected == n) {
+					found = true;
+					break;
+				}
+			}
+
+			if (found) {
+				cout << *workers[i];
+				cout << "请输入该工人的实际工时：" << endl;
+				double hours;
+				cin >> hours;
+				workers[i]->compute_pay(hours);
+			} else {
+				cout << "工人" << selected << "不存在。" << endl;
+			}
+		}
+	}
+
+	for (i = 0; i < 5; i++) {
+		delete workers[i];
+	}
+
+	cout << "程序结束，再见！" << endl;
+
+	return 0;
 }
